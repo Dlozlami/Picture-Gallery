@@ -1,12 +1,50 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Camera, CameraType, FlashMode } from 'expo-camera';
+import React, { useState, useEffect, useRef } from 'react';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as MediaLibrary from 'expo-media-library';
+import * as Location from 'expo-location';
 
-export default function Page() {
+export default function CameraScreen(){
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [image, setImage] = useState(null);
+  const [type, setType] = useState(CameraType.back);
+  const [cameraPermission, setCameraPermission] = useState(null);
+  const [locationPermission, setLocationPermission] = useState(null);
+  const [flash, setFlash] = useState(FlashMode.off)
+  const cameraRef = useRef(null);
+
+
+  useEffect(() => {
+    (async () => {
+      MediaLibrary.requestPermissionsAsync();
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      const locationStatus = await Location.requestForegroundPermissionsAsync();
+      setCameraPermission(cameraStatus.granted)
+      setLocationPermission(locationStatus.granted)
+
+      if (!locationPermission) {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      if (!cameraPermission) {
+        setErrorMsg('Permission to access the camera was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
-      </View>
+      <Camera
+        style={styles.camera}
+        type={type}
+        
+      />
     </View>
   );
 }
@@ -14,21 +52,6 @@ export default function Page() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
+    justifyContent: 'center',
   },
 });
