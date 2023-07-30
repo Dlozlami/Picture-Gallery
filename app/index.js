@@ -57,7 +57,7 @@ export default function CameraScreen(){
       try{
           await MediaLibrary.createAssetAsync(image);
           alert("Picture saved 😃.")
-          setImage(data.uri)
+          setImage(null)
       }catch(e){
         console.log(e)
       }
@@ -73,6 +73,12 @@ export default function CameraScreen(){
         flashMode={flash}
         ref={cameraRef}
       >
+        <View style={styles.moreOptions}>
+          <Button icon={"retweet"} onPress={()=>
+            setType(type === CameraType.back ? CameraType.front : CameraType.back)
+          }/>
+          <Button icon={"flash"} color={flash=== FlashMode.off? 'gray':'white'} onPress={()=>setFlash(flash=== FlashMode.off? FlashMode.on:FlashMode.off)}/>
+        </View>
       </Camera>
       :
       <Image source={{uri:image}} style={styles.camera}/>
