@@ -5,6 +5,9 @@
       "bundler": "metro"
     },
     "name": "picture-gallery",
-    "slug": "picture-gallery"
+    "slug": "picture-gallery",
+    "plugins": [
+      "react-native-vision-camera"
+    ]
   }
 }
