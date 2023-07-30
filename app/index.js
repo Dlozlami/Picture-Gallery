@@ -84,7 +84,7 @@ export default function CameraScreen(){
       <Image source={{uri:image}} style={styles.camera}/>
       }
       <SafeAreaView>
-          {!image?
+          {image?
             <View style={styles.moreOptions}>
               <Button title={"Re-take"} icon={"retweet"} onPress={() => setImage(null)}/>
               <Button title={"Save"} icon={"check"} onPress={saveImage}/>
