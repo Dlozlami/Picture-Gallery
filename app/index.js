@@ -43,7 +43,7 @@ export default function CameraScreen(){
       <Camera
         style={styles.camera}
         type={type}
-        
+        flashMode={flash}
       />
     </View>
   );
