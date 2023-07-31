@@ -4,7 +4,7 @@ import * as Location from "expo-location";
 import SQLite from "react-native-sqlite-storage";
 import * as FileSystem from "expo-file-system";
 
-export default function StoreToDB({ imgURL, locale }) {
+export default function StoreToDB({ picture, location}) {
   const [image, setImage] = useState(null);
 
   useEffect(() => {
@@ -20,17 +20,9 @@ export default function StoreToDB({ imgURL, locale }) {
       }
     };
 
-    const address = async () => {
-      let residential = await Location.reverseGeocodeAsync({
-        latitude: locale.coords.latitude,
-        longitude: locale.coords.longitude,
-      });
-      setPlace(residential);
-      console.log(residential);
-    };
-  }, [image, place]);
+  }, [image]);
 
-  return <View>{place}</View>;
+  return <View></View>;
 }
 
 const styles = StyleSheet.create({});
