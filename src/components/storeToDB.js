@@ -22,7 +22,7 @@ export default function StoreToDB({ imgURL, locale }) {
 
     const address = async () => {
       let residential = await Location.reverseGeocodeAsync({
-        latitude: locale.coords.latitude,
+        latitude: locale.coords.latitude, 
         longitude: locale.coords.longitude,
       });
       setPlace(residential);

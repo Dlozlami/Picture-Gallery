@@ -51,8 +51,6 @@ export default function CameraScreen() {
       try {
         const locale = await Location.getCurrentPositionAsync({});
         setLocation(locale);
-
-        //let options = makeEXIF(locale);
         //console.log(locale);
         const data = await cameraRef.current.takePictureAsync();
         setImage(data.uri);
@@ -78,18 +76,6 @@ export default function CameraScreen() {
         console.log(e);
       }
     }
-  };
-
-  const makeEXIF = (locale) => {
-    return {
-      exif: true,
-      additionalExif: {
-        GPSLatitude: locale.coords.latitude,
-        GPSLongitude: locale.coords.longitude,
-        GPSAltitude: locale.coords.altitude,
-        GPSDateTime: locale.timestamp,
-      },
-    };
   };
 
   return (
