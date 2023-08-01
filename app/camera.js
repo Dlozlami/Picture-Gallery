@@ -14,11 +14,15 @@ import * as Location from "expo-location";
 import Button from "../src/components/Button";
 import { MaterialIcons } from "@expo/vector-icons";
 import StoreToDB from "../src/components/storeToDB";
+import * as FileSystem from "expo-file-system";
+import { useNavigation } from '@react-navigation/native';
 
 export default function CameraScreen() {
+  const navigation = useNavigation();
   const [place, setPlace] = useState(null);
   const [location, setLocation] = useState(null);
-  const [image, setImage] = useState(null);
+  const [imageURL, setImageURL] = useState(null);
+  const [picture, setPicture] = useState(null);
   const [type, setType] = useState(CameraType.front);
   const [cameraPermission, setCameraPermission] = useState(null);
   const [locationPermission, setLocationPermission] = useState(null);
@@ -53,7 +57,7 @@ export default function CameraScreen() {
         setLocation(locale);
         //console.log(locale);
         const data = await cameraRef.current.takePictureAsync();
-        setImage(data.uri);
+        setImageURL(data.uri);
         //console.log(data);
       } catch (e) {
         console.log(e);
@@ -62,7 +66,7 @@ export default function CameraScreen() {
   };
 
   const saveImage = async () => {
-    if (image) {
+    if (imageURL) {
       try {
         let residential = await Location.reverseGeocodeAsync({
           latitude: location.coords.latitude,
@@ -70,8 +74,14 @@ export default function CameraScreen() {
         });
         setPlace(residential);
 
+        const base64Data = await FileSystem.readAsStringAsync(imageURL, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        setPicture(base64Data);
+        //console.log(base64Data);
+
         alert("Picture saved 😃.");
-        setImage(null);
+        setImageURL(null);
       } catch (e) {
         console.log(e);
       }
@@ -80,7 +90,7 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      {!image ? (
+      {!imageURL ? (
         <Camera
           style={styles.camera}
           type={type}
@@ -106,15 +116,15 @@ export default function CameraScreen() {
           </View>
         </Camera>
       ) : (
-        <Image source={{ uri: image }} style={styles.camera} />
+        <Image source={{ uri: imageURL }} style={styles.camera} />
       )}
       <SafeAreaView>
-        {image ? (
+        {imageURL ? (
           <View style={styles.moreOptions}>
             <Button
               title={"Re-take"}
               icon={"retweet"}
-              onPress={() => setImage(null)}
+              onPress={() => setImageURL(null)}
             />
             <Button title={"Save"} icon={"check"} onPress={saveImage} />
           </View>
@@ -124,12 +134,12 @@ export default function CameraScreen() {
               <MaterialIcons name="photo-library" size={24} color="black" />
             </TouchableOpacity>
             <Button icon={"camera"} onPress={takePicture} size={48} />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {navigation.navigate('gallery');}}>
               <MaterialIcons name="photo-library" size={24} color="white" />
             </TouchableOpacity>
           </View>
         )}
-        {image && <StoreToDB imgURL={image} locale={location} />}
+
       </SafeAreaView>
     </View>
   );

@@ -11,9 +11,11 @@
   "dependencies": {
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
+    "@reduxjs/toolkit": "^1.9.5",
     "expo": "^48.0.7",
     "expo-camera": "~13.2.1",
     "expo-constants": "~14.2.1",
+    "expo-file-system": "~15.2.2",
     "expo-linking": "~4.0.1",
     "expo-location": "~15.1.1",
     "expo-media-library": "~15.2.3",
@@ -32,7 +34,7 @@
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-vision-camera": "^2.15.4",
     "react-native-web": "~0.18.7",
-    "expo-file-system": "~15.2.2"
+    "react-redux": "^8.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
