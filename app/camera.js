@@ -1,21 +1,21 @@
 import { Camera, CameraType, FlashMode } from "expo-camera";
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Platform,
-  SafeAreaView,
   StyleSheet,
   Text,
   Image,
   View,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 import Button from "../src/components/Button";
 import { MaterialIcons } from "@expo/vector-icons";
 import StoreToDB from "../src/components/storeToDB";
+import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
 export default function CameraScreen() {
   const navigation = useNavigation();
@@ -23,10 +23,10 @@ export default function CameraScreen() {
   const [location, setLocation] = useState(null);
   const [imageURL, setImageURL] = useState(null);
   const [picture, setPicture] = useState(null);
-  const [type, setType] = useState(CameraType.front);
   const [cameraPermission, setCameraPermission] = useState(null);
   const [locationPermission, setLocationPermission] = useState(null);
-  const [flash, setFlash] = useState(FlashMode.off);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function CameraScreen() {
           longitude: location.coords.longitude,
         });
         setPlace(residential);
-
+        console.log("Place: ", place);
         const base64Data = await FileSystem.readAsStringAsync(imageURL, {
           encoding: FileSystem.EncodingType.Base64,
         });
@@ -90,35 +90,45 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      {!imageURL ? (
-        <Camera
-          style={styles.camera}
-          type={type}
-          flashMode={flash}
-          ref={cameraRef}
-        >
-          <View style={styles.moreOptions}>
-            <Button
-              icon={"retweet"}
-              onPress={() =>
-                setType(
-                  type === CameraType.back ? CameraType.front : CameraType.back
-                )
-              }
-            />
-            <Button
-              icon={"flash"}
-              color={flash === FlashMode.off ? "gray" : "white"}
-              onPress={() =>
-                setFlash(flash === FlashMode.off ? FlashMode.on : FlashMode.off)
-              }
-            />
-          </View>
-        </Camera>
-      ) : (
-        <Image source={{ uri: imageURL }} style={styles.camera} />
-      )}
-      <SafeAreaView>
+      <View style={styles.capture}>
+        {!imageURL ? (
+          <Camera
+            style={styles.camera}
+            type={type}
+            flashMode={flash}
+            ref={cameraRef}
+          >
+            <View style={styles.moreOptions}>
+              <Button
+                icon={"retweet"}
+                onPress={() =>
+                  setType(
+                    type === CameraType.back
+                      ? CameraType.front
+                      : CameraType.back
+                  )
+                }
+              />
+              <Button
+                icon={"flash"}
+                color={
+                  flash === Camera.Constants.FlashMode.off ? "gray" : "white"
+                }
+                onPress={() =>
+                  setFlash(
+                    flash === Camera.Constants.FlashMode.off
+                      ? Camera.Constants.FlashMode.on
+                      : Camera.Constants.FlashMode.off
+                  )
+                }
+              />
+            </View>
+          </Camera>
+        ) : (
+          <Image source={{ uri: imageURL }} style={styles.camera} />
+        )}
+      </View>
+      <View style={styles.controls}>
         {imageURL ? (
           <View style={styles.moreOptions}>
             <Button
@@ -131,16 +141,19 @@ export default function CameraScreen() {
         ) : (
           <View style={styles.moreOptions}>
             <TouchableOpacity>
-              <MaterialIcons name="photo-library" size={24} color="black" />
+              <Text>N/A</Text>
             </TouchableOpacity>
             <Button icon={"camera"} onPress={takePicture} size={48} />
-            <TouchableOpacity onPress={() => {navigation.navigate('gallery');}}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("gallery");
+              }}
+            >
               <MaterialIcons name="photo-library" size={24} color="white" />
             </TouchableOpacity>
           </View>
         )}
-
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
@@ -150,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     backgroundColor: "black",
-    paddingVertical: 20,
+    paddingTop: Constants.statusBarHeight,
   },
   camera: {
     flex: 1,
@@ -162,5 +175,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 15,
     alignItems: "center",
+  },
+  capture: {
+    height: "90%",
+  },
+  controls: {
+    height: "10%",
   },
 });
