@@ -61,7 +61,7 @@ export default function CameraScreen() {
         //console.log(base64Data.split(":")[0]);
 
         alert("Picture saved 😃.");
-        setImageURL(null);
+        dispatch(setImageURL(null));
       } catch (e) {
         console.log(e);
       }
