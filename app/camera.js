@@ -11,6 +11,7 @@ import {
   requestPermissions,
   capturePhoto,
   setImageURL,
+  savePhoto,
 } from "../features/cameraSlice";
 import { useDispatch, useSelector } from "react-redux";
 import * as SQLite from "expo-sqlite";
@@ -52,18 +53,8 @@ export default function CameraScreen() {
 
   const saveImage = async () => {
     if (imageURL) {
-      try {
-        const base64Data = await FileSystem.readAsStringAsync(imageURL, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        setPicture(base64Data);
-        //console.log(base64Data.split(":")[0]);
-
-        alert("Picture saved 😃.");
-        dispatch(setImageURL(null));
-      } catch (e) {
-        console.log(e);
-      }
+      dispatch(savePhoto());
+      dispatch(setImageURL(null));
     }
   };
 

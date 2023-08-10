@@ -41,6 +41,7 @@ export const capturePhoto = createAsyncThunk(
     try {
       const data = await cameraRef.current.takePictureAsync();
       dispatch(setImageURL(data.uri));
+      console.log("the img url: ", data.url);
     } catch (e) {
       console.log(e);
     }
@@ -49,13 +50,15 @@ export const capturePhoto = createAsyncThunk(
 
 export const savePhoto = createAsyncThunk(
   "camera/savePhoto",
-  async (_, { dispatch }) => {
+  async (_, { getState, dispatch }) => {
     try {
-      const base64Data = await FileSystem.readAsStringAsync(imageURL, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+      const base64Data = await FileSystem.readAsStringAsync(
+        getState().imageURL,
+        {
+          encoding: FileSystem.EncodingType.Base64,
+        }
+      );
       dispatch(setImage("data:image/jpg;base64," + base64Data));
-
       alert("Picture saved 😃.");
       dispatch(setImageURL(null));
     } catch (e) {
