@@ -1,27 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
+import * as SQLite from "expo-sqlite";
 
-const initialState = {
-  value: 0,
-};
+const initialState = {};
 
 export const databaseSlice = createSlice({
   name: "database",
   initialState,
   reducers: {
-    increment: (state) => {
-      state.value += 1;
-    },
-    decrement: (state) => {
-      state.value -= 1;
-    },
-    incrementByAmount: (state, action) => {
-      state.value += action.payload;
-    },
+    createTableAlbum: (state, action) => {},
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { increment, decrement, incrementByAmount } =
-  databaseSlice.actions;
+export const { createTableAlbum } = databaseSlice.actions;
 
 export default databaseSlice.reducer;

@@ -41,7 +41,6 @@ export const capturePhoto = createAsyncThunk(
     try {
       const data = await cameraRef.current.takePictureAsync();
       dispatch(setImageURL(data.uri));
-      console.log("Photo data: ", data);
     } catch (e) {
       console.log(e);
     }
@@ -55,11 +54,10 @@ export const savePhoto = createAsyncThunk(
       const base64Data = await FileSystem.readAsStringAsync(imageURL, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      setPicture(base64Data);
-      //console.log(base64Data.split(":")[0]);
+      dispatch(setImage("data:image/jpg;base64," + base64Data));
 
       alert("Picture saved 😃.");
-      setImageURL(null);
+      dispatch(setImageURL(null));
     } catch (e) {
       console.log(e);
     }
@@ -72,7 +70,7 @@ const cameraSlice = createSlice({
     cameraPermission: null,
     locationPermission: null,
     imageURL: null,
-    imageBase64: null,
+    image: null,
     currentLocation: null,
     currentStreetAddress: null,
   },
@@ -89,9 +87,11 @@ const cameraSlice = createSlice({
     setCurrentStreetAddress: (state, action) => {
       state.currentStreetAddress = action.payload;
     },
-
     setImageURL: (state, action) => {
       state.imageURL = action.payload;
+    },
+    setImage: (state, action) => {
+      state.image = action.payload;
     },
   },
   extraReducers: (builder) => {

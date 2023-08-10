@@ -2,10 +2,8 @@ import { Camera, CameraType, FlashMode } from "expo-camera";
 import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Text, Image, View, TouchableOpacity } from "react-native";
 
-import * as Location from "expo-location";
 import Button from "../src/components/Button";
 import { MaterialIcons } from "@expo/vector-icons";
-import StoreToDB from "../src/components/storeToDB";
 import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
@@ -15,17 +13,18 @@ import {
   setImageURL,
 } from "../features/cameraSlice";
 import { useDispatch, useSelector } from "react-redux";
-import Preloader from "../src/components/preloader";
+import * as SQLite from "expo-sqlite";
 
 export default function CameraScreen() {
-  const { cameraPermission, locationPermission, imageURL } = useSelector(
-    (state) => state.camera
-  );
+  const db = SQLite.openDatabase("picgallery.db");
+  const {
+    cameraPermission,
+    locationPermission,
+    currentStreetAddress,
+    imageURL,
+  } = useSelector((state) => state.camera);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [place, setPlace] = useState(null);
-  const [location, setLocation] = useState(null);
-  const [picture, setPicture] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
@@ -33,7 +32,7 @@ export default function CameraScreen() {
 
   useEffect(() => {
     dispatch(requestPermissions());
-    if (!locationPermission) {
+    if (locationPermission) {
       console.log("Permission to access location was denied");
       return;
     }
@@ -70,7 +69,7 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      {/*console.log("This is my location: ", currentStreetAddress[0].name)*/}
+      {console.log("This is my location: ", currentStreetAddress)}
 
       <View style={styles.capture}>
         {!imageURL ? (
