@@ -7,7 +7,7 @@ import { pictures } from "../pic/pictures";
 import PictureCard from "../src/components/pictureCard";
 import TestComp from "../src/components/testComp";
 
-export default function Gallery() {
+export default function GalleryScreen() {
   const navigation = useNavigation();
   //console.log(pictures);
 

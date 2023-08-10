@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { EvilIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function PictureCard({ photo }) {
   const [openModal, setOpenModal] = useState(false);
@@ -27,27 +29,26 @@ export default function PictureCard({ photo }) {
         </ImageBackground>
       </TouchableOpacity>
 
-      <Modal visible={openModal} style={{}}>
+      <Modal visible={openModal} transparent={true}>
         <View style={styles.containerModal}>
-          <View
+          <TouchableOpacity
+            onPress={() => setOpenModal(false)}
             style={{ ...styles.infoModal, justifyContent: "space-between" }}
           >
             <Ionicons name="image-outline" size={24} color="white" />
-            <TouchableOpacity onPress={() => setOpenModal(false)}>
-              <Ionicons name="close-circle-outline" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.img}>
-            <Image
-              source={photo.url}
-              resizeMode="cover"
-              style={{ width: "100%", height: 230 }}
-            />
-          </View>
+            <Ionicons name="close-circle-outline" size={24} color="white" />
+          </TouchableOpacity>
+
+          <Image
+            source={photo.url}
+            resizeMode="contain"
+            style={{ width: "100%", height: 550 }}
+          />
 
           <View style={styles.infoModal}>
-            <Ionicons name="ios-location-sharp" size={24} color="white" />
+            <MaterialIcons name="my-location" size={20} color="white" />
+            <Text> </Text>
             <Text style={styles.locationTextModal}>{photo.location}</Text>
           </View>
         </View>
@@ -61,12 +62,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: 150,
     margin: 5,
+    borderRadius: 10,
   },
   info: {
     padding: 5,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
     flexDirection: "row",
-
     marginTop: 75,
   },
   locationText: {
@@ -77,15 +78,19 @@ const styles = StyleSheet.create({
 
   containerModal: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    justifyContent: "center",
+    backgroundColor: "rgba(70,16,247, 0.5)",
+    padding: 5,
   },
   infoModal: {
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "black",
     flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
   },
   locationTextModal: {
     color: "white",
-    fontSize: 16,
+    fontSize: 20,
     fontStyle: "italic",
   },
 

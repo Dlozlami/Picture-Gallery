@@ -1,84 +1,64 @@
 import { Camera, CameraType, FlashMode } from "expo-camera";
 import React, { useState, useEffect, useRef } from "react";
-import {
-  StyleSheet,
-  Text,
-  Image,
-  View,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import * as MediaLibrary from "expo-media-library";
+import { StyleSheet, Text, Image, View, TouchableOpacity } from "react-native";
+
 import * as Location from "expo-location";
 import Button from "../src/components/Button";
 import { MaterialIcons } from "@expo/vector-icons";
 import StoreToDB from "../src/components/storeToDB";
 import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
+import {
+  requestPermissions,
+  capturePhoto,
+  setImageURL,
+} from "../features/cameraSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Preloader from "../src/components/preloader";
 
 export default function CameraScreen() {
+  const { cameraPermission, locationPermission, imageURL } = useSelector(
+    (state) => state.camera
+  );
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [place, setPlace] = useState(null);
   const [location, setLocation] = useState(null);
-  const [imageURL, setImageURL] = useState(null);
   const [picture, setPicture] = useState(null);
-  const [cameraPermission, setCameraPermission] = useState(null);
-  const [locationPermission, setLocationPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const cameraRef = useRef(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    (async () => {
-      MediaLibrary.requestPermissionsAsync();
-      const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      const locationStatus = await Location.requestForegroundPermissionsAsync();
-      setCameraPermission(cameraStatus.granted);
-      setLocationPermission(locationStatus.granted);
+    dispatch(requestPermissions());
+    if (!locationPermission) {
+      console.log("Permission to access location was denied");
+      return;
+    }
 
-      if (locationPermission === false) {
-        console.log("Permission to access location was denied");
-        return;
-      }
-
-      if (cameraPermission === false) {
-        <Text>Permission to access the camera was denied</Text>;
-        return;
-      }
-      const locale = await Location.getCurrentPositionAsync({});
-    })();
+    if (!cameraPermission) {
+      console.log("Permission to access camera was denied");
+      return;
+    }
   }, []);
 
+  //isFocused ? console.log("On camera") : console.log("off air");
   const takePicture = async () => {
     if (cameraRef) {
-      try {
-        const locale = await Location.getCurrentPositionAsync({});
-        setLocation(locale);
-        //console.log(locale);
-        const data = await cameraRef.current.takePictureAsync();
-        setImageURL(data.uri);
-        //console.log(data);
-      } catch (e) {
-        console.log(e);
-      }
+      dispatch(capturePhoto(cameraRef));
     }
   };
 
   const saveImage = async () => {
     if (imageURL) {
       try {
-        let residential = await Location.reverseGeocodeAsync({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
-        setPlace(residential);
-        console.log("Place: ", place);
         const base64Data = await FileSystem.readAsStringAsync(imageURL, {
           encoding: FileSystem.EncodingType.Base64,
         });
         setPicture(base64Data);
-        //console.log(base64Data);
+        //console.log(base64Data.split(":")[0]);
 
         alert("Picture saved 😃.");
         setImageURL(null);
@@ -90,40 +70,44 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
+      {/*console.log("This is my location: ", currentStreetAddress[0].name)*/}
+
       <View style={styles.capture}>
         {!imageURL ? (
-          <Camera
-            style={styles.camera}
-            type={type}
-            flashMode={flash}
-            ref={cameraRef}
-          >
-            <View style={styles.moreOptions}>
-              <Button
-                icon={"retweet"}
-                onPress={() =>
-                  setType(
-                    type === CameraType.back
-                      ? CameraType.front
-                      : CameraType.back
-                  )
-                }
-              />
-              <Button
-                icon={"flash"}
-                color={
-                  flash === Camera.Constants.FlashMode.off ? "gray" : "white"
-                }
-                onPress={() =>
-                  setFlash(
-                    flash === Camera.Constants.FlashMode.off
-                      ? Camera.Constants.FlashMode.on
-                      : Camera.Constants.FlashMode.off
-                  )
-                }
-              />
-            </View>
-          </Camera>
+          isFocused ? (
+            <Camera
+              style={styles.camera}
+              type={type}
+              flashMode={flash}
+              ref={cameraRef}
+            >
+              <View style={styles.moreOptions}>
+                <Button
+                  icon={"retweet"}
+                  onPress={() =>
+                    setType(
+                      type === CameraType.back
+                        ? CameraType.front
+                        : CameraType.back
+                    )
+                  }
+                />
+                <Button
+                  icon={"flash"}
+                  color={
+                    flash === Camera.Constants.FlashMode.off ? "gray" : "white"
+                  }
+                  onPress={() =>
+                    setFlash(
+                      flash === Camera.Constants.FlashMode.off
+                        ? Camera.Constants.FlashMode.on
+                        : Camera.Constants.FlashMode.off
+                    )
+                  }
+                />
+              </View>
+            </Camera>
+          ) : null
         ) : (
           <Image source={{ uri: imageURL }} style={styles.camera} />
         )}
@@ -134,7 +118,7 @@ export default function CameraScreen() {
             <Button
               title={"Re-take"}
               icon={"retweet"}
-              onPress={() => setImageURL(null)}
+              onPress={() => dispatch(setImageURL(null))}
             />
             <Button title={"Save"} icon={"check"} onPress={saveImage} />
           </View>
