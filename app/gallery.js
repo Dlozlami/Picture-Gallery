@@ -21,6 +21,7 @@ export default function Gallery() {
       />
       <FlatList
         data={pictures}
+        numColumns={2}
         keyExtractor={(photo) => photo.id}
         renderItem={({ item: photo }) => <PictureCard photo={photo} />}
       />
@@ -31,9 +32,9 @@ export default function Gallery() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "gray",
-    paddingTop: Constants.statusBarHeight,
+    backgroundColor: "black",
+    paddingTop: Constants.statusBarHeight + 10,
     paddingHorizontal: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
 });

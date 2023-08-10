@@ -14,4 +14,9 @@ export const pictures = [
     url: require("./lucas-kapla-wQLAGv4_OYs-unsplash.jpg"),
     location: "Green Park, Jobert Street",
   },
+  {
+    id: "PGM39FJ94JI1",
+    url: require("./tom-arrowsmith-7HNftpNvqho-unsplash.jpg"),
+    location: "25 Moonlit Street",
+  },
 ];
