@@ -1,29 +1,34 @@
 import { Camera, CameraType, FlashMode } from "expo-camera";
 import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Text, Image, View, TouchableOpacity } from "react-native";
-
 import Button from "../src/components/Button";
 import { MaterialIcons } from "@expo/vector-icons";
 import Constants from "expo-constants";
-import * as FileSystem from "expo-file-system";
+import {
+  initializeDatabase,
+  insertPhotoData,
+} from "../src/components/database";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import {
   requestPermissions,
   capturePhoto,
   setImageURL,
   savePhoto,
+  countPhotoRecords,
 } from "../features/cameraSlice";
 import { useDispatch, useSelector } from "react-redux";
-import * as SQLite from "expo-sqlite";
 
 export default function CameraScreen() {
-  const db = SQLite.openDatabase("picgallery.db");
+  const [db, setDb] = useState(initializeDatabase());
+  const [dbLength, setDbLength] = useState(0);
   const {
     cameraPermission,
     locationPermission,
     currentStreetAddress,
     imageURL,
+    image,
   } = useSelector((state) => state.camera);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [type, setType] = useState(Camera.Constants.Type.back);
@@ -46,21 +51,39 @@ export default function CameraScreen() {
 
   //isFocused ? console.log("On camera") : console.log("off air");
   const takePicture = async () => {
+    setLoading(true);
     if (cameraRef) {
       dispatch(capturePhoto(cameraRef));
     }
+    setLoading(false);
   };
 
   const saveImage = async () => {
     if (imageURL) {
       dispatch(savePhoto());
+      console.log("print 1");
+      const photoData = {
+        photo: image,
+        streetaddress: "123 Main St",
+        district: "Downtown",
+        city: "Your City",
+        country: "Your Country",
+        postal_code: "12345",
+      };
+      console.log("print 2");
+      insertPhotoData(db, photoData);
+      countPhotoRecords(db, (count) => {
+        setDbLength(count);
+        console.log(`Total photo records: ${count}`);
+      });
+      console.log("print 3");
       dispatch(setImageURL(null));
     }
   };
 
   return (
     <View style={styles.container}>
-      {console.log("This is my location: ", currentStreetAddress)}
+      {/* console.log("This is my location: ", currentStreetAddress)*/}
 
       <View style={styles.capture}>
         {!imageURL ? (

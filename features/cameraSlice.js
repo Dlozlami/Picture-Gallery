@@ -14,7 +14,7 @@ export const getCurrentLocation = createAsyncThunk(
         latitude: locale.coords.latitude,
         longitude: locale.coords.longitude,
       });
-      dispatch(setCurrentStreetAddress(residential));
+      dispatch(setCurrentStreetAddress(residential[0]));
     } catch (error) {
       console.log(error);
     }
@@ -52,14 +52,12 @@ export const savePhoto = createAsyncThunk(
   "camera/savePhoto",
   async (_, { getState, dispatch }) => {
     try {
-      const base64Data = await FileSystem.readAsStringAsync(
-        getState().imageURL,
-        {
-          encoding: FileSystem.EncodingType.Base64,
-        }
-      );
+      let getImgURL = getState().camera.imageURL;
+      //console.log("Get the states: ", getState().camera.imageURL);
+      const base64Data = await FileSystem.readAsStringAsync(getImgURL, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
       dispatch(setImage("data:image/jpg;base64," + base64Data));
-      alert("Picture saved 😃.");
       dispatch(setImageURL(null));
     } catch (e) {
       console.log(e);
@@ -111,5 +109,6 @@ export const {
   setCurrentLocation,
   setCurrentStreetAddress,
   setImageURL,
+  setImage,
 } = cameraSlice.actions;
 export default cameraSlice.reducer;

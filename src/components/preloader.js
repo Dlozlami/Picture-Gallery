@@ -3,7 +3,7 @@ import React from "react";
 
 export default function Preloader(size, color, loading) {
   return (
-    <Modal visible={false} style={styles.container}>
+    <Modal visible={loading} style={styles.container} transparent>
       <ActivityIndicator size={size ? size : "large"} />
     </Modal>
   );
@@ -11,8 +11,7 @@ export default function Preloader(size, color, loading) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "center",
-    flexDirection: "row",
+    alignItems: "center",
   },
 });
